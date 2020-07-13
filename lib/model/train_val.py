@@ -153,13 +153,14 @@ class SolverWrapper(object):
     return lr, train_op
 
   def find_previous(self):
+    # if(self.pretrained_model is not None):
     sfiles = os.path.join(self.output_dir, cfg.TRAIN.SNAPSHOT_PREFIX + '_iter_*.ckpt.meta')
     sfiles = glob.glob(sfiles)
     sfiles.sort(key=os.path.getmtime)
     # Get the snapshot name in TensorFlow
     redfiles = []
     for stepsize in cfg.TRAIN.STEPSIZE:
-      redfiles.append(os.path.join(self.output_dir, 
+      redfiles.append(os.path.join(self.output_dir,
                       cfg.TRAIN.SNAPSHOT_PREFIX + '_iter_{:d}.ckpt.meta'.format(stepsize+1)))
     sfiles = [ss.replace('.meta', '') for ss in sfiles if ss not in redfiles]
 
@@ -183,18 +184,22 @@ class SolverWrapper(object):
     variables = tf.global_variables()
     # Initialize all variables first
     sess.run(tf.variables_initializer(variables, name='init'))
-    var_keep_dic = self.get_variables_in_checkpoint_file(self.pretrained_model)
-    # Get the variables to restore, ignoring the variables to fix
-    variables_to_restore = self.net.get_variables_to_restore(variables, var_keep_dic)
+    if(self.pretrained_model is None):
+      print("Training model from scratch, with random initial weights")
+    else:
+      var_keep_dic = self.get_variables_in_checkpoint_file(self.pretrained_model)
+      # Get the variables to restore, ignoring the variables to fix
+      variables_to_restore = self.net.get_variables_to_restore(variables, var_keep_dic)
 
-    restorer = tf.train.Saver(variables_to_restore)
-    restorer.restore(sess, self.pretrained_model)
-    print('Loaded.')
-    # Need to fix the variables before loading, so that the RGB weights are changed to BGR
-    # For VGG16 it also changes the convolutional weights fc6 and fc7 to
-    # fully connected weights
-    self.net.fix_variables(sess, self.pretrained_model)
-    print('Fixed.')
+      restorer = tf.train.Saver(variables_to_restore)
+      restorer.restore(sess, self.pretrained_model)
+      print('Loaded.')
+      # Need to fix the variables before loading, so that the RGB weights are changed to BGR
+      # For VGG16 it also changes the convolutional weights fc6 and fc7 to
+      # fully connected weights
+      self.net.fix_variables(sess, self.pretrained_model)
+      print('Fixed.')
+
     last_snapshot_iter = 0
     rate = cfg.TRAIN.LEARNING_RATE
     stepsizes = list(cfg.TRAIN.STEPSIZE)
