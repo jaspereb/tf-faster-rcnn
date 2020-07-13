@@ -12,9 +12,21 @@ from __future__ import print_function
 
 __sets = {}
 from datasets.pascal_voc import pascal_voc
+from datasets.plums_day import plums_day
+from datasets.plums_night import plums_night
 from datasets.coco import coco
 
 import numpy as np
+
+# Set up plums_day
+for split in ['train', 'val', 'trainval', 'test']:
+  name = 'plums_day_{}'.format(split)
+  __sets[name] = (lambda split=split: plums_day(split))
+
+# Set up plums_night
+for split in ['train', 'val', 'trainval', 'test']:
+  name = 'plums_night_{}'.format(split)
+  __sets[name] = (lambda split=split: plums_night(split))
 
 # Set up voc_<year>_<split> 
 for year in ['2007', '2012']:
