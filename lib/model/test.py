@@ -149,8 +149,14 @@ def test_net(sess, net, imdb, weights_filename, max_per_image=100, thresh=0.):
   # timers
   _t = {'im_detect' : Timer(), 'misc' : Timer()}
 
+  im_names = []
   for i in range(num_images):
     im = cv2.imread(imdb.image_path_at(i))
+    # print("Reading image {} for i equals {}".format(imdb.image_path_at(i), i))
+
+    im_name = os.path.split(imdb.image_path_at(i))[1]
+    im_name = os.path.splitext(im_name)[0]
+    im_names.append(im_name)
 
     _t['im_detect'].tic()
     scores, boxes = im_detect(sess, net, im)
@@ -187,7 +193,11 @@ def test_net(sess, net, imdb, weights_filename, max_per_image=100, thresh=0.):
   det_file = os.path.join(output_dir, 'detections.pkl')
   with open(det_file, 'wb') as f:
     pickle.dump(all_boxes, f, pickle.HIGHEST_PROTOCOL)
+  det_file = os.path.join(output_dir, 'detectedImgs.pkl')
+  with open(det_file, 'w') as f:
+    pickle.dump(im_names, f, pickle.HIGHEST_PROTOCOL)
+  print("Detection saved to pickle")
 
-  print('Evaluating detections')
-  imdb.evaluate_detections(all_boxes, output_dir)
+  # print('Evaluating detections')
+  # imdb.evaluate_detections(all_boxes, output_dir)
 

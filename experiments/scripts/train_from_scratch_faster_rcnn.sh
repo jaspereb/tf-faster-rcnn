@@ -19,7 +19,7 @@ case ${DATASET} in
     TRAIN_IMDB="plums_day_trainval"
     TEST_IMDB="plums_day_test"
     STEPSIZE="[10000]"
-    ITERS=30000
+    ITERS=20000
     ANCHORS="[8,16,32]"
     RATIOS="[0.5,1,2]"
     ;;
@@ -27,7 +27,7 @@ case ${DATASET} in
     TRAIN_IMDB="plums_night_trainval"
     TEST_IMDB="plums_night_test"
     STEPSIZE="[10000]"
-    ITERS=30000
+    ITERS=20000
     ANCHORS="[8,16,32]"
     RATIOS="[0.5,1,2]"
     ;;
